@@ -6,10 +6,14 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
     "test": "vitest"
   },
   "dependencies": {
     "@companion/shared": "workspace:*",
+    "@companion/router": "workspace:*",
+    "@companion/resolver-offline": "workspace:*",
+    "@companion/resolver-cache": "workspace:*",
     "express": "^4.18.0"
   },
   "devDependencies": {
