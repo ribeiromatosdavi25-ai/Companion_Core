@@ -16,7 +16,8 @@
     "@companion/resolver-cache": "workspace:*",
     "@companion/resolver-external": "workspace:*",
     "@companion/orchestrator": "workspace:*",
-    "express": "^4.18.0"
+    "express": "^4.18.0",
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.0",
