@@ -5,13 +5,18 @@ import {
 } from '@companion/shared/types';
 import { TimeUtils } from '@companion/shared/utils/time';
 
+export interface RouterOptions {
+  devModeAllowed?: boolean;
+}
+
 export class ContractRouter {
   route(
     request: NormalizedRequest,
     sessionStart: Date,
-    lastTurn: Date | null
+    lastTurn: Date | null,
+    options: RouterOptions = {}
   ): ExecutionContract {
-    const path = this.determinePath(request);
+    const path = this.determinePath(request, options);
     const risk_score = this.computeRisk(request);
 
     return {
@@ -31,14 +36,20 @@ export class ContractRouter {
       },
       fallback_id: this.selectFallback(path, risk_score),
       trace: {
-        decision_reason: this.explainDecision(path, request),
+        decision_reason: this.explainDecision(path, request, options.devModeAllowed),
       },
     };
   }
 
-  private determinePath(request: NormalizedRequest): ExecutionPath {
+  private determinePath(request: NormalizedRequest, options: RouterOptions): ExecutionPath {
     // Offline-first heuristic
     if (this.isOfflineCapable(request)) return 'OFFLINE';
+    
+    // Dev mode: allow external APIs
+    if (options.devModeAllowed && this.isCacheablePublic(request)) {
+      return 'EXTERNAL_API';
+    }
+    
     if (this.isCacheablePublic(request)) return 'SAFE_CACHE';
     if (this.requiresPrivateData(request)) return 'DENY';
     
@@ -64,11 +75,12 @@ export class ContractRouter {
 
   private selectFallback(path: ExecutionPath, risk: number): any {
     if (risk >= 0.8) return 'FALLBACK_DENY_PRIVATE';
-    if (path === 'SAFE_CACHE') return 'FALLBACK_STALE_CACHE';
+    if (path === 'SAFE_CACHE' || path === 'EXTERNAL_API') return 'FALLBACK_STALE_CACHE';
     return 'FALLBACK_PUBLIC_SAFE';
   }
 
-  private explainDecision(path: ExecutionPath, request: NormalizedRequest): string {
-    return `router.${path.toLowerCase()}.${request.intent_hints[0] || 'default'}`;
+  private explainDecision(path: ExecutionPath, request: NormalizedRequest, devMode?: boolean): string {
+    const prefix = devMode ? 'dev_mode.' : '';
+    return `${prefix}router.${path.toLowerCase()}.${request.intent_hints[0] || 'default'}`;
   }
 }
