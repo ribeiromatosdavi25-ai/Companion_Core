@@ -1,3 +1,5 @@
 packages:
   - 'shared'
   - 'services/*'
+  - 'services/resolver/*'
+  - 'services/orchestrator/*'
