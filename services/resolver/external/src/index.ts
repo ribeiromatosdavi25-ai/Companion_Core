@@ -1,0 +1,1 @@
+export { ExternalResolver } from './ExternalResolver';
