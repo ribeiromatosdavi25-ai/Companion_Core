@@ -14,6 +14,8 @@
     "@companion/router": "workspace:*",
     "@companion/resolver-offline": "workspace:*",
     "@companion/resolver-cache": "workspace:*",
+    "@companion/resolver-external": "workspace:*",
+    "@companion/orchestrator": "workspace:*",
     "express": "^4.18.0"
   },
   "devDependencies": {
